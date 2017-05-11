@@ -3,7 +3,8 @@
 
 #include <QLabel>
 #include "mdialog.h"
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -11,7 +12,7 @@ class QTimer;
 class QextSerialPort;
 class QextSerialEnumerator;
 
-class MainWindow : public QDialog, public MDialog
+class MainWindow : public MDialog
 {
     Q_OBJECT
 
@@ -19,6 +20,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public :
+    void onClosed();
 private slots:
     //void onPortAddedOrRemoved();
     void onReadyRead();

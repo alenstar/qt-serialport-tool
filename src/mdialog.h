@@ -1,6 +1,6 @@
 ﻿#ifndef MDIALOG_H
 #define MDIALOG_H
-
+#include <functional>
 #include <QDialog>
 #include <QMouseEvent>
 #include <QPoint>
@@ -31,28 +31,30 @@
 #endif
 #include <QSystemTrayIcon>
 
-class MDialog
+class MDialog: public QDialog
 {
     // Q_OBJECT
 public:
-    explicit MDialog();
-    ~MDialog();
-    void retranslateMDialogUi();
-    void setupTheme(QLayout* m);
+    explicit MDialog(QWidget *parent);
+    //virtual ~MDialog();
+    void setup(QWidget *w, QVBoxLayout *mainLayout);
     void showMaxBtn();
     void showMiniBtn();
     void showMenuBtn();
-    void setMainWindow(QWidget* w);
     void setupTray();
     virtual void createTrayActions(QSystemTrayIcon *tray);
     void SetTitleAndIcon(QString &title, QIcon &icon);
 signals:
 
-public: // slots:
+public slots:
 
-    virtual void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
-    virtual void btnMenuMaxClicked();
-	//virtual void closeWindow(){ this->close(); };
+    void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void btnMenuMaxClicked();
+public:
+    void setOnClose(std::function<void()> cb);
+    //virtual void onMinimize();
+    //virtual void onMaximize();
+    //virtual void closeWindow(){ this->close(); };
 protected:
 #if 0
     void mousePressEvent(QMouseEvent *event);
@@ -68,9 +70,11 @@ private:
     //QPoint dPos;
     QPoint mousePoint;              //鼠标拖动自定义标题栏时的坐标
     bool mousePressed;              //鼠标是否按下
+    std::function<void()> oncloseCb;
 
+private slots:
+    void onclosed();
 protected:
-    QVBoxLayout *topLayout;
     QWidget *widget_title;
     QHBoxLayout *titleLayout;
     QLabel *lab_Ico;
@@ -81,12 +85,10 @@ protected:
     QPushButton *btnMenu_Menu;
     QPushButton *btnMenu_Mini;
     QPushButton *btnMenu_Max;
-    // QWidget *widget_main;
-    QVBoxLayout *mainLayout;
 
     bool isMax;
     QRect nowLocation;
-    QWidget* parent;
+    QWidget *parent;
 };
 
 #endif // MDIALOG_H
