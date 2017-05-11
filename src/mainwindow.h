@@ -1,9 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <QLabel>
-
+#include "mdialog.h"
 namespace Ui {
 class MainWindow;
 }
@@ -12,7 +11,7 @@ class QTimer;
 class QextSerialPort;
 class QextSerialEnumerator;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QDialog, public MDialog
 {
     Q_OBJECT
 

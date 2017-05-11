@@ -14,11 +14,15 @@
 #endif
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QDialog (parent),
     ui(new Ui::MainWindow)
 {
+    // this->setupMDialogUi();
     ui->setupUi(this);
-    ui->mainToolBar->hide();
+    this->setMainWindow(this);
+    this->setupTheme(this->layout());
+    // this->setupMDialogUi();
+    // ui->mainToolBar->hide();
 #if 0
     //! [0]
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
@@ -67,9 +71,9 @@ MainWindow::MainWindow(QWidget *parent) :
     txLabel = new QLabel(this);
     rxLabel = new QLabel(this);
 
-    ui->statusBar->addPermanentWidget(infoLabel);
-    ui->statusBar->addPermanentWidget(txLabel);
-    ui->statusBar->addPermanentWidget(rxLabel);
+    // ui->statusBar->addPermanentWidget(infoLabel);
+    // ui->statusBar->addPermanentWidget(txLabel);
+    // ui->statusBar->addPermanentWidget(rxLabel);
 
     //! [1]
     PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
@@ -100,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
     //connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
 
-    connect(ui->action_Setup, SIGNAL(triggered()), SLOT(onSetUp_triggered()));
+    // connect(ui->action_Setup, SIGNAL(triggered()), SLOT(onSetUp_triggered()));
 
 }
 

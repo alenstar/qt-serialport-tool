@@ -18,12 +18,20 @@ SOURCES += src/main.cpp\
         src/mainwindow.cpp \
     src/qled.cpp \
     src/setupdialog.cpp \
-    src/execdialog.cpp
+    src/execdialog.cpp \
+    src/mdialog.cpp \
+    src/jvhelper.cpp \
+    src/jvmessagebox.cpp \
+    src/aerobutton/aerobutton.cpp
 
 HEADERS  += src/mainwindow.h \
     src/qled.h \
     src/setupdialog.h \
-    src/execdialog.h
+    src/execdialog.h \
+    src/mdialog.h \
+    src/jvhelper.h \
+    src/jvmessagebox.h \
+    src/aerobutton/aerobutton.h
 
 FORMS    += ui/mainwindow.ui \
     ui/setupdialog.ui \

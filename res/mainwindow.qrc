@@ -1,8 +1,28 @@
 <RCC>
     <qresource prefix="/">
+        <file>theme/add-line_horizontal.png</file>
+        <file>theme/add-line_vertical.png</file>
+        <file>theme/array_down.png</file>
+        <file>theme/array_up.png</file>
+        <file>theme/checkbox_checked.png</file>
+        <file>theme/checkbox_unchecked.png</file>
+        <file>theme/error.png</file>
+        <file>theme/info.png</file>
+        <file>theme/question.png</file>
+        <file>theme/radio_normal.png</file>
+        <file>theme/radio_selected.png</file>
+        <file>theme/sub-line_horizontal.png</file>
+        <file>theme/sub-line_vertical.png</file>
+        <file>theme/navy.css</file>
+        <file>theme/black.css</file>
+        <file>theme/blue.css</file>
+        <file>theme/gray.css</file>
+        <file>theme/default.css</file>
         <file>help.png</file>
         <file>logo.png</file>
         <file>setup.png</file>
         <file>on_off.png</file>
+        <file>fileclose.png</file>
+        <file>fontawesome-webfont.ttf</file>
     </qresource>
 </RCC>
