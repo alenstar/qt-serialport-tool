@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <QLabel>
-
-namespace Ui {
+#include "mdialog.h"
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -12,7 +12,7 @@ class QTimer;
 class QextSerialPort;
 class QextSerialEnumerator;
 
-class MainWindow : public QMainWindow
+class MainWindow : public MDialog
 {
     Q_OBJECT
 
@@ -20,6 +20,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public :
+    void onClosed();
 private slots:
     //void onPortAddedOrRemoved();
     void onReadyRead();

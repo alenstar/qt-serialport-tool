@@ -1,21 +1,40 @@
-# Compiled Object files
+# C++ objects and libs
+serialport
 *.slo
 *.lo
 *.o
-*.obj
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Compiled Static libraries
-*.lai
-*.la
 *.a
-*.lib
+*.la
+*.lai
+*.so
+*.dll
+*.dylib
 
-# Executables
-*.exe
-*.out
-*.app
+# Qt-es
+
+/.qmake.cache
+/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+Makefile*
+*build-*
+
+# QtCreator
+
+*.autosave
+
+# QtCtreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
+# QtCtreator CMake
+CMakeLists.txt.user*
+
+build
