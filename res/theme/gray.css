@@ -119,11 +119,11 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:unchecked {
-	image: url(:/image/checkbox_unchecked.png);
+	image: url(:/theme/checkbox_unchecked.png);
 }
 
 QCheckBox::indicator:checked {
-	image: url(:/image/checkbox_checked.png); 
+	image: url(:/theme/checkbox_checked.png); 
 }
 
 QRadioButton {
@@ -136,11 +136,11 @@ QRadioButton::indicator {
 }
 
 QRadioButton::indicator::unchecked {
-	image: url(:/image/radio_normal.png); 
+	image: url(:/theme/radio_normal.png); 
 }
 
 QRadioButton::indicator::checked {
-	image: url(:/image/radio_selected.png); 
+	image: url(:/theme/radio_selected.png); 
 }
 
 QComboBox,QDateEdit,QSpinBox {
@@ -181,11 +181,11 @@ QSpinBox::down-button {
 }
 
 QSpinBox::up-arrow{
-	image: url(:/image/array_up.png); 
+	image: url(:/theme/array_up.png); 
 }
 
 QComboBox::down-arrow,QDateEdit::down-arrow, QSpinBox::down-arrow {
-	image: url(:/image/array_down.png); 
+	image: url(:/theme/array_down.png); 
 }
 
 QMenu {
@@ -310,7 +310,7 @@ QScrollBar::add-line:vertical {
 	width:10px;
 	subcontrol-position: bottom; 
 	subcontrol-origin: margin;
-	border-image:url(:/image/add-line_vertical.png);
+	border-image:url(:/theme/add-line_vertical.png);
 }
 
 QScrollBar::add-line:horizontal {
@@ -318,7 +318,7 @@ QScrollBar::add-line:horizontal {
 	width:10px;
 	subcontrol-position: right;
 	subcontrol-origin: margin;
-	border-image:url(:/image/add-line_horizontal.png);
+	border-image:url(:/theme/add-line_horizontal.png);
 }
 
 QScrollBar::sub-line:vertical {
@@ -326,7 +326,7 @@ QScrollBar::sub-line:vertical {
 	width:10px;
 	subcontrol-position: top; 
 	subcontrol-origin: margin;
-	border-image:url(:/image/sub-line_vertical.png);
+	border-image:url(:/theme/sub-line_vertical.png);
 }
 
 QScrollBar::sub-line:horizontal {
@@ -334,7 +334,7 @@ QScrollBar::sub-line:horizontal {
 	width:10px;
 	subcontrol-position: left;
 	subcontrol-origin: margin;
-	border-image:url(:/image/sub-line_horizontal.png);
+	border-image:url(:/theme/sub-line_horizontal.png);
 }
 
 QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical {

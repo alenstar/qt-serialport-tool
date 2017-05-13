@@ -43,7 +43,9 @@ public:
     void showMenuBtn();
     void setupTray();
     virtual void createTrayActions(QSystemTrayIcon *tray);
-    void SetTitleAndIcon(QString &title, QIcon &icon);
+    void setTitleAndIcon(QString &title, QIcon &icon);
+    void setTitle(QString &title);
+    void setIcon(QIcon &icon);
 signals:
 
 public slots:

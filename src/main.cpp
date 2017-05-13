@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "jvhelper.h"
+#include "helper.h"
 #include <QApplication>
 #include <QTextCodec>
 int main(int argc, char *argv[])
@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
-    JVHelper::SetStyle("gray");
+    Helper::SetStyle("gray");
     MainWindow w;
     w.show();
 

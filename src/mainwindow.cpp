@@ -17,13 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     MDialog (parent),
     ui(new Ui::MainWindow)
 {
-    // this->setupMDialogUi();
     ui->setupUi(this);
-    //this->ui->centralWidget->setContentsMargins(0, 0, 0, 0);
     this->setup(this, this->ui->topLayout);
     this->setOnClose(std::bind(&MainWindow::onClosed, this));
-    // this->setupMDialogUi();
-    // ui->mainToolBar->hide();
+    QString title = "serial port debug tools";
+    this->setTitle(title);
 #if 0
     //! [0]
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())

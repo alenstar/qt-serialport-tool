@@ -34,13 +34,13 @@
 #endif
 #include "aerobutton/aerobutton.h"
 
-class JVMessageBox : public QDialog
+class MessageBox : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit JVMessageBox(bool center = true, QWidget *parent = 0);
-    ~JVMessageBox();
+    explicit MessageBox(bool center = true, QWidget *parent = 0);
+    ~MessageBox();
 
     void SetMessage(const QString &msg, int type);
 
@@ -53,7 +53,7 @@ private slots:
     void on_btnOk_clicked();
 
 private:
-    //Ui::JVMessageBox *ui;
+    //Ui::MessageBox *ui;
 
     QPoint mousePoint;              //鼠标拖动自定义标题栏时的坐标
     bool mousePressed;              //鼠标是否按下
@@ -118,7 +118,7 @@ private:
         sizePolicy2.setHeightForWidth(lab_Title->sizePolicy().hasHeightForWidth());
         lab_Title->setSizePolicy(sizePolicy2);
         lab_Title->setText(QString::fromUtf8(""));
-        lab_Title->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        lab_Title->setAlignment(Qt::AlignLeading | Qt::AlignLeft | Qt::AlignVCenter);
 
         horizontalLayout_2->addWidget(lab_Title);
 
@@ -152,7 +152,8 @@ private:
 
         widget_main = new QWidget(this);
         widget_main->setObjectName(QString::fromUtf8("widget_main"));
-        widget_main->setStyleSheet(QString::fromUtf8("font: 11pt \"\345\276\256\350\275\257\351\233\205\351\273\221\";"));
+        widget_main->setStyleSheet(
+            QString::fromUtf8("font: 11pt \"\345\276\256\350\275\257\351\233\205\351\273\221\";"));
         verticalLayout_2 = new QVBoxLayout(widget_main);
         verticalLayout_2->setSpacing(5);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
@@ -162,7 +163,8 @@ private:
         labIcoMain = new QLabel(groupBox);
         labIcoMain->setObjectName(QString::fromUtf8("labIcoMain"));
         labIcoMain->setGeometry(QRect(10, 10, 45, 45));
-        labIcoMain->setStyleSheet(QString::fromUtf8("border-image: url(:/image/info.png);"));
+        labIcoMain->setStyleSheet(
+            QString::fromUtf8("border-image: url(:/image/info.png);"));
         labInfo = new QLabel(groupBox);
         labInfo->setObjectName(QString::fromUtf8("labInfo"));
         labInfo->setGeometry(QRect(70, 10, 211, 41));
@@ -175,7 +177,8 @@ private:
         horizontalLayout_3 = new QHBoxLayout(layoutWidget);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding,
+                                           QSizePolicy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer);
 

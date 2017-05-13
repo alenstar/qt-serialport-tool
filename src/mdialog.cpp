@@ -1,4 +1,4 @@
-﻿#include "jvhelper.h"
+﻿#include "helper.h"
 #include "mdialog.h"
 #include <QPalette>
 #include <QPixmap>
@@ -182,8 +182,8 @@ void MDialog::setup(QWidget *w, QVBoxLayout *mainLayout)
 #endif // QT_NO_TOOLTIP
     //btnMenu_Close->setText(QString());
 
-    JVHelper::GetInstance()->SetIcon(this->lab_Ico, QChar(0xf015), 12);
-    JVHelper::GetInstance()->SetIcon(this->btnMenu_Close, QChar(0xf00d), 10);
+    Helper::GetInstance()->SetIcon(this->lab_Ico, QChar(0xf015), 12);
+    Helper::GetInstance()->SetIcon(this->btnMenu_Close, QChar(0xf00d), 10);
 
     //JVHelper::FormInCenter(this);
     connect(this->btnMenu_Close, &QPushButton::clicked, [this]() {
@@ -214,7 +214,7 @@ void MDialog::showMaxBtn()
 #ifndef QT_NO_TOOLTIP
         btnMenu_Max->setToolTip(i18nConve("Maximize"));
 #endif // QT_NO_TOOLTIP
-        JVHelper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf096), 10);
+        Helper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf096), 10);
 
         connect(this->btnMenu_Max, SIGNAL(clicked()), this, SLOT(btnMenuMaxClicked()));
     }
@@ -240,7 +240,7 @@ void MDialog::showMiniBtn()
 #ifndef QT_NO_TOOLTIP
         btnMenu_Mini->setToolTip(i18nConve("Minimize"));
 #endif // QT_NO_TOOLTIP
-        JVHelper::GetInstance()->SetIcon(this->btnMenu_Mini, QChar(0xf068), 10);
+        Helper::GetInstance()->SetIcon(this->btnMenu_Mini, QChar(0xf068), 10);
         // connect(this->btnMenu_Mini, SIGNAL(clicked()), this, SLOT(showMinimized()));
     }
 }
@@ -265,11 +265,11 @@ void MDialog::showMenuBtn()
 #ifndef QT_NO_TOOLTIP
         btnMenu_Menu->setToolTip(i18nConve("Menu"));
 #endif // QT_NO_TOOLTIP
-        JVHelper::GetInstance()->SetIcon(this->btnMenu_Menu, QChar(0xf0c9), 10);
+        Helper::GetInstance()->SetIcon(this->btnMenu_Menu, QChar(0xf0c9), 10);
     }
 }
 
-void MDialog::SetTitleAndIcon(QString &title, QIcon &icon)
+void MDialog::setTitleAndIcon(QString &title, QIcon &icon)
 {
     parent->setWindowIcon(icon);
     parent->setWindowTitle(title);
@@ -310,6 +310,17 @@ void MDialog::createTrayActions(QSystemTrayIcon *tray)
     //connect(trayIconMenu, SIGNAL(aboutToShow()), this, SLOT(showNormal()));
 }
 
+void MDialog::setTitle(QString &title)
+{
+    parent->setWindowTitle(title);
+    this->lab_Title->setText(title);
+}
+
+void MDialog::setIcon(QIcon &icon)
+{
+    parent->setWindowIcon(icon);
+}
+
 void MDialog::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
@@ -332,12 +343,12 @@ void MDialog::btnMenuMaxClicked()
 {
     if (this->isMax) {
         parent->setGeometry(this->nowLocation);
-        JVHelper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf096), 10);
+        Helper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf096), 10);
         btnMenu_Max->setToolTip(i18nConve("Maximize"));
     } else {
         this->nowLocation = parent->geometry();
         parent->setGeometry(qApp->desktop()->availableGeometry());
-        JVHelper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf079), 10);
+        Helper::GetInstance()->SetIcon(this->btnMenu_Max, QChar(0xf079), 10);
         btnMenu_Max->setToolTip(i18nConve("Restore"));
     }
     this->isMax = !this->isMax;

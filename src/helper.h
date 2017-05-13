@@ -1,9 +1,9 @@
-﻿#ifndef JVHELPER_H
-#define JVHELPER_H
+﻿#ifndef HELPER_H
+#define HELPER_H
 
 //#if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
 //#if (QT_VERSION <= QT_VERSION_CHECK(5,0,0))
- #include <QApplication>
+#include <QApplication>
 //#ifdef USE_QT4
 #if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
 //#include <QtGui>
@@ -26,16 +26,18 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QStringList>
-#include "jvmessagebox.h"
+#include "messagebox.h"
 
-bool copyDirectoryFiles(const QString &fromDir, const QString &toDir, bool coverFileIfExist);
+bool copyDirectoryFiles(const QString &fromDir, const QString &toDir,
+                        bool coverFileIfExist);
 bool copyFileToPath(QString sourceDir, QString toDir, bool coverFileIfExist);
 
 #if 0
 class NoFocusRectangleStyle: public QCommonStyle
 {
 public:
-    void NoFocusRectangleStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+    void NoFocusRectangleStyle::drawPrimitive(PrimitiveElement element,
+                                              const QStyleOption *option, QPainter *painter, const QWidget *widget) const
     {
         if (QStyle::PE_FrameFocusRect == element )
             return;
@@ -44,31 +46,31 @@ public:
     }
 };
 #endif
-class JButton : public QPushButton
+class Button : public QPushButton
 {
     Q_OBJECT
 public:
-	explicit JButton(QWidget *parent = 0);
+    explicit Button(QWidget *parent = 0);
 };
 
-class JVHelper : public QObject
+class Helper : public QObject
 {
 private:
-    explicit JVHelper(QObject *parent = 0);
+    explicit Helper(QObject *parent = 0);
     QFont iconFont;
-    static JVHelper* __instance;
+    static Helper *__instance;
     //static QString AESKEY("FUCK19JIAG90WEI9");
     QIcon appIcon;
 public:
     QString devToken;
 #if 1
-    static JVHelper* GetInstance()
+    static Helper *GetInstance()
     {
         static QMutex mutex;
         if (!__instance) {
             QMutexLocker locker(&mutex);
             if (!__instance) {
-                __instance = new JVHelper;
+                __instance = new Helper;
             }
         }
         return __instance;
@@ -78,9 +80,9 @@ public:
     public:
         ~Garbo()
         {
-            if(JVHelper::__instance){
-                delete JVHelper::__instance;
-                JVHelper::__instance = NULL;
+            if (Helper::__instance) {
+                delete Helper::__instance;
+                Helper::__instance = NULL;
             }
         }
     };
@@ -141,14 +143,14 @@ public:
         qApp->installTranslator(translator);
     }
 
-    static void SetChinese(QString& lang)
+    static void SetChinese(QString &lang)
     {
         QTranslator *translator = new QTranslator(qApp);
         translator->load(lang);
         qApp->installTranslator(translator);
     }
 
-    static void SetLanguage(QString& lang)
+    static void SetLanguage(QString &lang)
     {
         QTranslator *translator = new QTranslator(qApp);
         translator->load(lang);
@@ -165,7 +167,7 @@ public:
     //显示信息框,仅确定按钮
     static void ShowMessageBoxInfo(QString info, bool center = true)
     {
-        JVMessageBox *msg = new JVMessageBox(center);
+        MessageBox *msg = new MessageBox(center);
         msg->SetMessage(info, 0);
         msg->exec();
     }
@@ -173,7 +175,7 @@ public:
     //显示错误框,仅确定按钮
     static void ShowMessageBoxError(QString info, bool center = true)
     {
-        JVMessageBox *msg = new JVMessageBox(center);
+        MessageBox *msg = new MessageBox(center);
         msg->SetMessage(info, 2);
         msg->exec();
     }
@@ -181,14 +183,14 @@ public:
     //显示询问框,确定和取消按钮
     static int ShowMessageBoxQuesion(QString info, bool center = true)
     {
-        JVMessageBox *msg = new JVMessageBox(center);
+        MessageBox *msg = new MessageBox(center);
         msg->SetMessage(info, 1);
         return msg->exec();
     }
 
     static int ShowMessageBoxAbout(QString info, bool center = true)
     {
-        JVMessageBox *msg = new JVMessageBox(center);
+        MessageBox *msg = new MessageBox(center);
         msg->SetMessage(info, 0);
         return msg->exec();
     }
@@ -226,20 +228,22 @@ public:
         frm->move(movePoint);
     }
 
-    void SetIcon(QLabel* lab, QChar c, int size);
+    void SetIcon(QLabel *lab, QChar c, int size);
 
-    void SetIcon(QPushButton* btn, QChar c, int size);
+    void SetIcon(QPushButton *btn, QChar c, int size);
 
-    QIcon& GetAppIcon();
+    QIcon &GetAppIcon();
     void SetAppIcon(QString name);
 
     bool TcpPortIsFreed(int port);
 
-    static QByteArray AES128ECBDecryption(QByteArray& key, QByteArray& data);
-    static QByteArray AES128ECBEncryption(QByteArray& key, QByteArray& data);
+    static QByteArray AES128ECBDecryption(QByteArray &key, QByteArray &data);
+    static QByteArray AES128ECBEncryption(QByteArray &key, QByteArray &data);
 
-    static QByteArray AES128CBCDecryption(QByteArray& key, QByteArray& iv, QByteArray& data);
-    static QByteArray AES128CBCEncryption(QByteArray& key, QByteArray& iv, QByteArray& data);
+    static QByteArray AES128CBCDecryption(QByteArray &key, QByteArray &iv,
+                                          QByteArray &data);
+    static QByteArray AES128CBCEncryption(QByteArray &key, QByteArray &iv,
+                                          QByteArray &data);
 
     static QString FromBase64ForUrl(QString base64String);
     static QString ToBase64StringForUrl(QString normalString);
@@ -251,9 +255,10 @@ inline QString GBK2UTF8(const QString &inStr)
     QTextCodec *gbk = QTextCodec::codecForName("GB18030");
     QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
-    //QByteArray g2u = utf8->fromUnicode(gbk->toUnicode(inStr.toLocal8Bit()));			  // gbk  convert utf8
-    return utf8->toUnicode(gbk->toUnicode(inStr.toLocal8Bit()).toUtf8());			  // gbk  convert utf8
-    //return utf8->toUnicode(gbk->fromUnicode(inStr));			  // gbk  convert utf8
+    //QByteArray g2u = utf8->fromUnicode(gbk->toUnicode(inStr.toLocal8Bit()));            // gbk  convert utf8
+    return utf8->toUnicode(gbk->toUnicode(
+                               inStr.toLocal8Bit()).toUtf8());             // gbk  convert utf8
+    //return utf8->toUnicode(gbk->fromUnicode(inStr));            // gbk  convert utf8
     //return utf8->toUnicode(g2u);
     //return g2u;
 }
@@ -292,88 +297,102 @@ inline QString utf82gbk(const std::string &inStr)
 }
 #endif
 
-QStringList findFiles(const QString& path = QString());
+QStringList findFiles(const QString &path = QString());
 QString readFile(const QString &filename);
 
 #include <math.h>
 void bd_decrypt(double bd_lat, double bd_lon, double &gg_lat, double &gg_lon);
 void bd_encrypt(double gg_lat, double gg_lon, double &bd_lat, double &bd_lon);
 
-class JLoader : public QLabel
+class Loader : public QLabel
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit JLoader(QString img, QWidget *parent = 0);
+    explicit Loader(QString img, QWidget *parent = 0);
 
-	JLoader(QPixmap& img, QWidget *parent = 0);
+    Loader(QPixmap &img, QWidget *parent = 0);
 
-	~JLoader(){
-		if(this->timer->isActive()){
-			this->timer->stop();
-		}
-		delete this->timer;
-	}
+    ~Loader()
+    {
+        if (this->timer->isActive()) {
+            this->timer->stop();
+        }
+        delete this->timer;
+    }
 
 public slots:
-	void start(int speed = 500){ this->timer->start(speed); }
-	void stop(){ this->timer->stop();}
+    void start(int speed = 500)
+    {
+        this->timer->start(speed);
+    }
+    void stop()
+    {
+        this->timer->stop();
+    }
 
 private slots:
-	void onTimeout(){
-		QMatrix matrix;
-		//matrix = matrix.translate(-this->img.width(), -this->img.height());
-		matrix = matrix.rotate(30);
-		//matrix = matrix.translate(this->img.width(), this->img.height());
+    void onTimeout()
+    {
+        QMatrix matrix;
+        //matrix = matrix.translate(-this->img.width(), -this->img.height());
+        matrix = matrix.rotate(30);
+        //matrix = matrix.translate(this->img.width(), this->img.height());
 
-		this->img = this->img.transformed(matrix, Qt::SmoothTransformation);
-		this->setPixmap(this->img);
-	}
+        this->img = this->img.transformed(matrix, Qt::SmoothTransformation);
+        this->setPixmap(this->img);
+    }
 
 private:
-	QTimer* timer;
-	QPixmap img;
+    QTimer *timer;
+    QPixmap img;
 };
 
 class CycloProgress : public QLabel
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit CycloProgress(QString img, QWidget *parent = 0);
-	CycloProgress(QString img, QString bg, QWidget *parent = 0);
-	CycloProgress(QPixmap& img, QWidget *parent = 0);
-	CycloProgress(QPixmap& img, QPixmap& bg, QWidget *parent = 0);
-	/*~CycloProgress(){
-		if (this->timer->isActive()){
-			this->timer->stop();
-		}
-		delete this->timer;
-	}*/
-	void setMinLoops(int loops = 3);
-	/**
-	* @brief startAnimation start the Animation
-	* @param interval   unit is  milliseconds
-	*/
-	void startAnimation(int interval = 25);
-	void stopAnimation();
+    explicit CycloProgress(QString img, QWidget *parent = 0);
+    CycloProgress(QString img, QString bg, QWidget *parent = 0);
+    CycloProgress(QPixmap &img, QWidget *parent = 0);
+    CycloProgress(QPixmap &img, QPixmap &bg, QWidget *parent = 0);
+    /*~CycloProgress(){
+        if (this->timer->isActive()){
+            this->timer->stop();
+        }
+        delete this->timer;
+    }*/
+    void setMinLoops(int loops = 3);
+    /**
+    * @brief startAnimation start the Animation
+    * @param interval   unit is  milliseconds
+    */
+    void startAnimation(int interval = 25);
+    void stopAnimation();
 
-	void start(int speed = 25){ this->startAnimation(speed); }
-	void stop(){ this->stopAnimation(); }
+    void start(int speed = 25)
+    {
+        this->startAnimation(speed);
+    }
+    void stop()
+    {
+        this->stopAnimation();
+    }
 signals:
-	void runMinLoopsEnough();
+    void runMinLoopsEnough();
 protected:
-	void paintEvent(QPaintEvent *);
-	void timerEvent(QTimerEvent *event);
+    void paintEvent(QPaintEvent *);
+    void timerEvent(QTimerEvent *event);
 
 private slots:
-	//void onTimeout();
+    //void onTimeout();
 
 private:
-	int timerID;
-	int minLoops;
-	QPixmap m_pixmap;
-	QPixmap m_bg;
-	qreal m_rotation;
-	QTimer* timer;
+    int timerID;
+    int minLoops;
+    QPixmap m_pixmap;
+    QPixmap m_bg;
+    qreal m_rotation;
+    QTimer *timer;
 };
 
-#endif // JVHELPER_H
+#endif // HELPER_H
