@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = serialport
 TEMPLATE = app
+QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI
 
 include(./qextserialport/qextserialport.pri)
 

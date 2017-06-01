@@ -50,6 +50,7 @@ QGroupBox::title {
 	background-color:gray;
 }
 
+/*
 .QPushButton{
 	border-style: none;
 	border: 0px;
@@ -77,6 +78,7 @@ QGroupBox::title {
 .QPushButton:pressed{ 
 	background: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 #454648, stop:1 #7A7A7A);
 }
+*/
 
 QPushButton#menuBtn, QPushButton#menuCloseBtn, QPushButton#menuMaxBtn, QPushButton#menuMinBtn, QPushButton#btnMenu,QPushButton#btnMenu_Mini,QPushButton#btnMenu_Max,QPushButton#btnMenu_Close,QPushButton#btnMenu_Menu{
 	border-radius:0px;
