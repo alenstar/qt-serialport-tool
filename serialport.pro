@@ -14,7 +14,7 @@ QMAKE_CXXFLAGS += -std=c++11 -Wall -Wextra -D_GLIBCXX_USE_CXX11_ABI
 
 include(./qextserialport/qextserialport.pri)
 
-INCLUDEPATH += src ./
+INCLUDEPATH += src ./ include/
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
     src/qled.cpp \
@@ -23,7 +23,19 @@ SOURCES += src/main.cpp\
     src/mdialog.cpp \
     src/aerobutton/aerobutton.cpp \
     src/helper.cpp \
-    src/messagebox.cpp
+    src/messagebox.cpp \
+    src/aeio/adlist.c \
+    src/aeio/ae.c \
+    src/aeio/anet.c \
+    src/aeio/common.c \
+    src/aeio/forward.c \
+    src/aeio/syncio.c \
+    src/aeio/zmalloc.c \
+    src/tcp/tcpclient.cpp \
+    src/udp/udpclient.cpp \
+    src/tcp/tcpserver.cpp \
+    src/udp/udpserver.cpp \
+    src/loop/loop.cpp
 
 HEADERS  += src/mainwindow.h \
     src/qled.h \
@@ -32,7 +44,12 @@ HEADERS  += src/mainwindow.h \
     src/mdialog.h \
     src/aerobutton/aerobutton.h \
     src/helper.h \
-    src/messagebox.h
+    src/messagebox.h \
+    src/tcp/tcpclient.h \
+    src/udp/udpclient.h \
+    src/tcp/tcpserver.h \
+    src/udp/udpserver.h \
+    src/loop/loop.h
 
 FORMS    += ui/mainwindow.ui \
     ui/setupdialog.ui \
