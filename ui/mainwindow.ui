@@ -54,7 +54,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tabServer">
          <attribute name="title">
@@ -70,7 +70,7 @@
            </rect>
           </property>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -88,7 +88,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_4">
+            <widget class="QComboBox" name="cbox_tcp_addr">
              <property name="editable">
               <bool>true</bool>
              </property>
@@ -108,7 +108,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox">
+            <widget class="QComboBox" name="cbox_tcp_port">
              <property name="inputMethodHints">
               <set>Qt::ImhDigitsOnly</set>
              </property>
@@ -121,15 +121,24 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="btn_tcp_listen">
              <property name="text">
               <string>TCP侦听</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="flat">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -147,7 +156,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_3">
+            <widget class="QComboBox" name="cbox_udp_addr">
              <property name="editable">
               <bool>true</bool>
              </property>
@@ -164,7 +173,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="comboBox_2">
+            <widget class="QComboBox" name="cbox_udp_port">
              <property name="inputMethodHints">
               <set>Qt::ImhDigitsOnly</set>
              </property>
@@ -177,15 +186,18 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="btn_udp_listen">
              <property name="text">
               <string>UDP侦听</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>570</x>
@@ -270,12 +282,12 @@
            </rect>
           </property>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
             <y>20</y>
-            <width>292</width>
+            <width>331</width>
             <height>26</height>
            </rect>
           </property>
@@ -332,12 +344,12 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
             <y>50</y>
-            <width>306</width>
+            <width>331</width>
             <height>26</height>
            </rect>
           </property>
@@ -572,12 +584,12 @@
          <attribute name="title">
           <string>串口</string>
          </attribute>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>20</x>
             <y>40</y>
-            <width>427</width>
+            <width>621</width>
             <height>26</height>
            </rect>
           </property>
@@ -645,12 +657,12 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>20</x>
             <y>10</y>
-            <width>192</width>
+            <width>281</width>
             <height>26</height>
            </rect>
           </property>

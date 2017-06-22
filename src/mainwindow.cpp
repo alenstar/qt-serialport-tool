@@ -1,11 +1,13 @@
-#include "qextserialport/qextserialport.h"
-#include "qextserialport/qextserialenumerator.h"
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "logdef.h"
+#include "qextserialport/qextserialenumerator.h"
+#include "qextserialport/qextserialport.h"
 #include "setupdialog.h"
-#include <QtCore>
-#include <QMessageBox>
+#include "ui_mainwindow.h"
+
 #include <QDebug>
+#include <QMessageBox>
+#include <QtCore>
 
 #if defined(Q_OS_WIN)
 #define WORD_WRAP "\r\n"
@@ -13,15 +15,13 @@
 #define WORD_WRAP "\n"
 #endif
 
-MainWindow::MainWindow(QWidget *parent) :
-    MDialog (parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    this->setup(this, this->ui->topLayout);
-    this->setOnClose(std::bind(&MainWindow::onClosed, this));
-    QString title = "serial port debug tools";
-    this->setTitle(title);
+MainWindow::MainWindow(QWidget *parent)
+    : MDialog(parent), ui(new Ui::MainWindow), _tcp_server(nullptr) {
+  ui->setupUi(this);
+  this->setup(this, this->ui->topLayout);
+  this->setOnClose(std::bind(&MainWindow::onClosed, this));
+  QString title = "serial port debug tools";
+  this->setTitle(title);
 #if 0
     //! [0]
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
@@ -61,28 +61,29 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->queryModeBox->addItem("EventDriven", QextSerialPort::EventDriven);
     //! [0]
 #endif
-    ui->led->turnOff();
+  ui->led->turnOff();
 
-    timer = new QTimer(this);
-    timer->setInterval(40);
+  timer = new QTimer(this);
+  timer->setInterval(40);
 
-    infoLabel = new QLabel(this);
-    txLabel = new QLabel(this);
-    rxLabel = new QLabel(this);
+  infoLabel = new QLabel(this);
+  txLabel = new QLabel(this);
+  rxLabel = new QLabel(this);
 
-    // ui->statusBar->addPermanentWidget(infoLabel);
-    // ui->statusBar->addPermanentWidget(txLabel);
-    // ui->statusBar->addPermanentWidget(rxLabel);
+  // ui->statusBar->addPermanentWidget(infoLabel);
+  // ui->statusBar->addPermanentWidget(txLabel);
+  // ui->statusBar->addPermanentWidget(rxLabel);
 
-    //! [1]
-    PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
-    port = new QextSerialPort(settings, QextSerialPort::Polling);
-    //port = new QextSerialPort(ui->portBox->currentText(), settings, QextSerialPort::Polling);
-    //! [1]
-    port = new QextSerialPort(settings, QextSerialPort::Polling);
+  //! [1]
+  PortSettings settings = {BAUD115200, DATA_8, PAR_NONE, STOP_1, FLOW_OFF, 10};
+  port = new QextSerialPort(settings, QextSerialPort::Polling);
+  // port = new QextSerialPort(ui->portBox->currentText(), settings,
+  // QextSerialPort::Polling);
+  //! [1]
+  port = new QextSerialPort(settings, QextSerialPort::Polling);
 
-    enumerator = new QextSerialEnumerator(this);
-    enumerator->setUpNotifications();
+  enumerator = new QextSerialEnumerator(this);
+  enumerator->setUpNotifications();
 #if 0
     connect(ui->baudRateBox, SIGNAL(currentIndexChanged(int)),
             SLOT(onBaudRateBox_currentIndexChanged(int)));
@@ -101,32 +102,35 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->portBox, SIGNAL(editTextChanged(QString)),
             SLOT(onPortBox_editTextChanged(QString)));
 #endif
-    connect(ui->openCloseButton, SIGNAL(clicked()),
-            SLOT(onOpenCloseButton_clicked()));
-    connect(ui->sendButton, SIGNAL(clicked()), SLOT(onSendButton_clicked()));
-    connect(ui->wordWrapBox, SIGNAL(stateChanged(int)),
-            SLOT(onWordWrapBox_stateChanged(int)));
+  connect(ui->openCloseButton, SIGNAL(clicked()),
+          SLOT(onOpenCloseButton_clicked()));
+  connect(ui->sendButton, SIGNAL(clicked()), SLOT(onSendButton_clicked()));
+  connect(ui->wordWrapBox, SIGNAL(stateChanged(int)),
+          SLOT(onWordWrapBox_stateChanged(int)));
 
-    connect(timer, SIGNAL(timeout()), SLOT(onReadyRead()));
-    connect(port, SIGNAL(readyRead()), SLOT(onReadyRead()));
+  connect(timer, SIGNAL(timeout()), SLOT(onReadyRead()));
+  connect(port, SIGNAL(readyRead()), SLOT(onReadyRead()));
 
-    //connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
-    //connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), SLOT(onPortAddedOrRemoved()));
+  // connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)),
+  // SLOT(onPortAddedOrRemoved()));
+  // connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)),
+  // SLOT(onPortAddedOrRemoved()));
 
-    // connect(ui->action_Setup, SIGNAL(triggered()), SLOT(onSetUp_triggered()));
-
+  // connect(ui->action_Setup, SIGNAL(triggered()), SLOT(onSetUp_triggered()));
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-    delete port;
+MainWindow::~MainWindow() {
+  if (_tcp_server) {
+    delete _tcp_server;
+    _tcp_server = nullptr;
+  }
+  delete ui;
+  delete port;
 }
 
-void MainWindow::onClosed()
-{
-    qDebug() << "close";
-    qApp->quit();
+void MainWindow::onClosed() {
+  qDebug() << "close";
+  qApp->quit();
 }
 #if 0
 void MainWindow::onPortBox_editTextChanged(const QString &arg1)
@@ -180,79 +184,83 @@ void MainWindow::onTimeoutBox_valueChanged(int arg1)
 }
 #endif
 
-void MainWindow::onOpenCloseButton_clicked()
-{
-    if (!port->isOpen()) {
-        port->setPortName(this->portName);
-        port->open(QIODevice::ReadWrite);
+void MainWindow::onOpenCloseButton_clicked() {
+  if (!port->isOpen()) {
+    port->setPortName(this->portName);
+    port->open(QIODevice::ReadWrite);
 
-        this->infoLabel->setText(this->portName);
-        this->txLabel->setText("TX: ");
-        this->rxLabel->setText("RX: ");
-    } else {
-        port->close();
-    }
+    this->infoLabel->setText(this->portName);
+    this->txLabel->setText("TX: ");
+    this->rxLabel->setText("RX: ");
+  } else {
+    port->close();
+  }
 
-    //If using polling mode, we need a QTimer
-    if (port->isOpen() && port->queryMode() == QextSerialPort::Polling)
-        timer->start();
-    else
-        timer->stop();
+  // If using polling mode, we need a QTimer
+  if (port->isOpen() && port->queryMode() == QextSerialPort::Polling)
+    timer->start();
+  else
+    timer->stop();
 
-    ui->led->turnOn(port->isOpen());
+  ui->led->turnOn(port->isOpen());
 }
 
-void MainWindow::onSendButton_clicked()
-{
-    if (port->isOpen() && !ui->sendEdit->toPlainText().isEmpty()) {
-        if (ui->hexSendBox->isChecked()) {
-            //port->write(stringToHex(g_array, ui->sendEdit->toPlainText().toLatin1()));
-            bool ok;
-            char data;
-            QStringList list;
-            g_array.clear();
-            list = ui->sendEdit->toPlainText().split(" ");
-            for (int i = 0; i < list.count(); i++) {
-                if (list.at(i) == " ") continue;
-                if (list.at(i).isEmpty()) continue;
-                data = (char)list.at(i).toInt(&ok, 16);
-                if (!ok) {
-                    QMessageBox::information(this, tr("Warning: "), tr("data is bad "),
-                                             QMessageBox::Ok);
-                }
-                g_array.append(data);
-            }
-            port->write(g_array);
-        } else port->write(ui->sendEdit->toPlainText().toLatin1());
-    }
-    if (ui->clearBox->isChecked())
-        ui->sendEdit->clear();
+void MainWindow::onSendButton_clicked() {
+  if (port->isOpen() && !ui->sendEdit->toPlainText().isEmpty()) {
+    if (ui->hexSendBox->isChecked()) {
+      // port->write(stringToHex(g_array,
+      // ui->sendEdit->toPlainText().toLatin1()));
+      bool ok;
+      char data;
+      QStringList list;
+      g_array.clear();
+      list = ui->sendEdit->toPlainText().split(" ");
+      for (int i = 0; i < list.count(); i++) {
+        if (list.at(i) == " ")
+          continue;
+        if (list.at(i).isEmpty())
+          continue;
+        data = (char)list.at(i).toInt(&ok, 16);
+        if (!ok) {
+          QMessageBox::information(this, tr("Warning: "), tr("data is bad "),
+                                   QMessageBox::Ok);
+        }
+        g_array.append(data);
+      }
+      port->write(g_array);
+    } else
+      port->write(ui->sendEdit->toPlainText().toLatin1());
+  }
+  if (ui->clearBox->isChecked())
+    ui->sendEdit->clear();
 }
 
-void MainWindow::onWordWrapBox_stateChanged(int state)
-{
-    //if(ui->wordWrapBox->checkState() == Qt::Checked) ui->recvEdit->insertPlainText(WORD_WRAP);
-    if (state == Qt::Checked) ui->recvEdit->insertPlainText(WORD_WRAP);
+void MainWindow::onWordWrapBox_stateChanged(int state) {
+  // if(ui->wordWrapBox->checkState() == Qt::Checked)
+  // ui->recvEdit->insertPlainText(WORD_WRAP);
+  if (state == Qt::Checked)
+    ui->recvEdit->insertPlainText(WORD_WRAP);
 }
 
-void MainWindow::onReadyRead()
-{
-    if (port->bytesAvailable()) {
-        ui->recvEdit->moveCursor(QTextCursor::End);
-        if (ui->hexShowBox->isChecked()) {
-            g_string.clear();
-            //ui->recvEdit->insertPlainText(showHex(g_string, port->readAll()));
-            QByteArray array;
-            array = port->readAll();
-            for (int i = 0; i < array.count(); i++) {
-                QString s;
-                s.sprintf("%02x ", (unsigned char)array.at(i));
-                g_string.append(s);
-            }
-            ui->recvEdit->insertPlainText(g_string);
-        } else ui->recvEdit->insertPlainText(QString::fromLatin1(port->readAll()));
-        if (ui->wordWrapBox->isChecked()) ui->recvEdit->insertPlainText(WORD_WRAP);
-    }
+void MainWindow::onReadyRead() {
+  if (port->bytesAvailable()) {
+    ui->recvEdit->moveCursor(QTextCursor::End);
+    if (ui->hexShowBox->isChecked()) {
+      g_string.clear();
+      // ui->recvEdit->insertPlainText(showHex(g_string, port->readAll()));
+      QByteArray array;
+      array = port->readAll();
+      for (int i = 0; i < array.count(); i++) {
+        QString s;
+        s.sprintf("%02x ", (unsigned char)array.at(i));
+        g_string.append(s);
+      }
+      ui->recvEdit->insertPlainText(g_string);
+    } else
+      ui->recvEdit->insertPlainText(QString::fromLatin1(port->readAll()));
+    if (ui->wordWrapBox->isChecked())
+      ui->recvEdit->insertPlainText(WORD_WRAP);
+  }
 }
 
 #if 0
@@ -270,30 +278,29 @@ void MainWindow::onPortAddedOrRemoved()
     ui->portBox->blockSignals(false);
 }
 #endif
-void MainWindow::onSetUp_triggered()
-{
-    setupDialog setup(this);
-    setup.setWindowTitle(tr("serial port setup"));
+void MainWindow::onSetUp_triggered() {
+  setupDialog setup(this);
+  setup.setWindowTitle(tr("serial port setup"));
 
-    connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), &setup,
-            SLOT(onPortAddedOrRemoved()));
-    connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), &setup,
-            SLOT(onPortAddedOrRemoved()));
+  connect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), &setup,
+          SLOT(onPortAddedOrRemoved()));
+  connect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), &setup,
+          SLOT(onPortAddedOrRemoved()));
 
-    if (setup.exec()) {
-        //qDebug()<<setup.getPortName();
-        this->portName = setup.getPortName();
-        this->port->setBaudRate((BaudRateType)setup.getBaudRate());
-        this->port->setDataBits((DataBitsType)setup.getDataBits());
-        this->port->setParity((ParityType)setup.getParity());
-        this->port->setStopBits((StopBitsType)setup.getStopBits());
-        this->port->setFlowControl((FlowType)setup.getFlowControl());
-        this->port->setQueryMode((QextSerialPort::QueryMode)setup.getQueryMode());
-    }
-    disconnect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), &setup,
-               SLOT(onPortAddedOrRemoved()));
-    disconnect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), &setup,
-               SLOT(onPortAddedOrRemoved()));
+  if (setup.exec()) {
+    // qDebug()<<setup.getPortName();
+    this->portName = setup.getPortName();
+    this->port->setBaudRate((BaudRateType)setup.getBaudRate());
+    this->port->setDataBits((DataBitsType)setup.getDataBits());
+    this->port->setParity((ParityType)setup.getParity());
+    this->port->setStopBits((StopBitsType)setup.getStopBits());
+    this->port->setFlowControl((FlowType)setup.getFlowControl());
+    this->port->setQueryMode((QextSerialPort::QueryMode)setup.getQueryMode());
+  }
+  disconnect(enumerator, SIGNAL(deviceDiscovered(QextPortInfo)), &setup,
+             SLOT(onPortAddedOrRemoved()));
+  disconnect(enumerator, SIGNAL(deviceRemoved(QextPortInfo)), &setup,
+             SLOT(onPortAddedOrRemoved()));
 }
 
 #if 0
@@ -373,3 +380,29 @@ char MainWindow::charToHex(char c)
     return -1;
 }
 #endif
+
+void MainWindow::on_btn_tcp_listen_clicked() {
+  if (!_tcp_server) {
+    _tcp_server =
+        new TcpServer(ui->cbox_tcp_addr->currentText().toStdString().c_str(),
+                      ui->cbox_tcp_port->currentText().toInt());
+  }
+  if (_tcp_server->is_running()) {
+    _tcp_server->close();
+    ui->btn_tcp_listen->setChecked(false);
+    ui->cbox_tcp_addr->setDisabled(false);
+    ui->cbox_tcp_port->setDisabled(false);
+  } else {
+    _tcp_server->set_parameters(
+        ui->cbox_tcp_addr->currentText().toStdString().c_str(),
+        ui->cbox_tcp_port->currentText().toInt());
+    if (!_tcp_server->listen()) {
+      qDebug("tcp listen failed!");
+    } else {
+      qDebug("tcp listen success");
+      ui->btn_tcp_listen->setChecked(true);
+      ui->cbox_tcp_addr->setDisabled(true);
+      ui->cbox_tcp_port->setDisabled(true);
+    }
+  }
+}

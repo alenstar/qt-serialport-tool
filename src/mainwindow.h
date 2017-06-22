@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include "mdialog.h"
+#include "tcp/tcpserver.h"
 namespace Ui
 {
 class MainWindow;
@@ -51,6 +52,8 @@ private slots:
 
     void onSetUp_triggered();
 
+    void on_btn_tcp_listen_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -65,6 +68,8 @@ private:
     QString portName;
     QString g_string;
     QByteArray g_array;
+
+    TcpServer* _tcp_server;
 };
 
 #endif // MAINWINDOW_H
