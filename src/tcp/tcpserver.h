@@ -3,6 +3,14 @@
 #include <QObject>
 #include "aeio.h"
 class TcpClient;
+typedef struct ClientInfo{
+    int fd;
+    int src_port;
+    int dst_port;
+    char src_addr[16];
+    char dst_addr[16];
+} ClientInfo;
+
 class TcpServer:public QObject
 {
 public:
@@ -21,7 +29,8 @@ private:
     int _port;
     std::string _addr;
 private:
-    std::list<int> _clients;
+    //std::list<int> _clients;
+    std::map<int, ClientInfo*> _clients;
 };
 
 #endif // TCPSERVER_H
