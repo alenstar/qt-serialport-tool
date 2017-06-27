@@ -29,12 +29,15 @@ bool TcpServer::listen() {
             },
             this)) {
       LOGE("Unrecoverable errror createing server file event");
+      return false;
     } else {
       _fd = sfd;
     }
   } else if (errno == EAFNOSUPPORT) {
     LOGE("Not listening to IPv4: unsupported");
+    return false;
   }
+  return true;
 }
 
 void TcpServer::close() {
@@ -95,10 +98,11 @@ void TcpServer::onaccept(aeEventLoop *loop, int fd, int mask) {
 void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
   int nread = 0;
   UNUSED(mask);
-  char buf[1024];
-  nread = ::read(fd, buf, 1024);
+  do{
+  nread = ::read(fd, _buffer, BUFFER_SIZE);
   if (nread == -1) {
     if (errno == EAGAIN) {
+        LOGD("buffer empty");
       return;
     } else {
       LOGE("Reading from client: %s", strerror(errno));
@@ -116,4 +120,6 @@ void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
     unlinkFileEvent(loop, fd);
     return;
   }
+  }while(nread == BUFFER_SIZE);
+  LOGD("onread: %s", _buffer);
 }

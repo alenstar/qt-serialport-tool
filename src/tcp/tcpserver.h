@@ -2,6 +2,9 @@
 #define TCPSERVER_H
 #include <QObject>
 #include "aeio.h"
+
+#define BUFFER_SIZE (1024 * 8)
+
 class TcpClient;
 typedef struct ClientInfo{
     int fd;
@@ -31,6 +34,7 @@ private:
 private:
     //std::list<int> _clients;
     std::map<int, ClientInfo*> _clients;
+    char _buffer[BUFFER_SIZE];
 };
 
 #endif // TCPSERVER_H

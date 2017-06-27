@@ -397,7 +397,7 @@ void MainWindow::on_btn_tcp_listen_clicked() {
         ui->cbox_tcp_addr->currentText().toStdString().c_str(),
         ui->cbox_tcp_port->currentText().toInt());
     if (!_tcp_server->listen()) {
-      qDebug("tcp listen failed!");
+      // qDebug("tcp listen failed!");
     } else {
       qDebug("tcp listen success");
       ui->btn_tcp_listen->setChecked(true);
