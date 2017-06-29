@@ -65,34 +65,34 @@ void TcpServer::onaccept(aeEventLoop *loop, int fd, int mask) {
 
   LOGD("Accepted %s:%d", cip, cport);
   // acceptCommonHandler(loop, cfd, 0, cip);
-  anetNonBlock(NULL, fd);
-  anetEnableTcpNoDelay(NULL, fd);
+  anetNonBlock(NULL, cfd);
+  anetEnableTcpNoDelay(NULL, cfd);
   // anetKeepAlive(NULL, fd, server.tcpkeepalive);
   if (aeCreateFileEvent(
-          loop, fd, AE_READABLE,
+          loop, cfd, AE_READABLE,
           [](aeEventLoop *loop, int fd, void *privdata, int mask) {
             TcpServer *thiz = static_cast<TcpServer *>(privdata);
             thiz->onread(loop, fd, mask);
           },
-          NULL) == AE_ERR) {
-    ::close(fd);
+          this) == AE_ERR) {
+    ::close(cfd);
     LOGE("not create file event");
     return;
   } else {
     std::map<int, ClientInfo *>::iterator it = _clients.find(fd);
     if (it != _clients.end()) {
       _clients.erase(it, _clients.begin());
-       unlinkFileEvent(loop, fd);
+       unlinkFileEvent(loop, cfd);
       delete it->second;
     }
     auto c = new ClientInfo;
-    c->fd = fd;
+    c->fd = cfd;
     c->src_port = cport;
     strcpy(c->src_addr, cip);
     c->src_addr[strlen(cip)] = '\0';
-    _clients.insert(std::make_pair(fd, c));
+    _clients.insert(std::make_pair(cfd, c));
   }
-  // write(fd, "hello world !", 14);
+  ::write(cfd, "hello world !", 14);
 }
 
 void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
@@ -105,7 +105,7 @@ void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
         LOGD("buffer empty");
       return;
     } else {
-      LOGE("Reading from client: %s", strerror(errno));
+      LOGE("Reading(%d %d) from client: %s",_fd, fd, strerror(errno));
       unlinkFileEvent(loop, fd);
       //_clients.remove(fd);
       std::map<int, ClientInfo *>::iterator it = _clients.find(fd);
@@ -121,5 +121,5 @@ void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
     return;
   }
   }while(nread == BUFFER_SIZE);
-  LOGD("onread: %s", _buffer);
+  LOGD("onread:%d %s",_fd,  _buffer);
 }
