@@ -54,6 +54,7 @@ private slots:
 
     void on_btn_tcp_listen_clicked();
 
+    void onmessage(int fd, char* data, unsigned int len);
 private:
     Ui::MainWindow *ui;
 

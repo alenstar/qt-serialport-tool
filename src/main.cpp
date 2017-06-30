@@ -7,6 +7,8 @@
 
 Loop* defaultLoop = 0;
 
+//Q_DECLARE_METATYPE(size_t)
+
 int main(int argc, char *argv[])
 {
 #if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
@@ -14,6 +16,7 @@ int main(int argc, char *argv[])
 #endif
 
     QApplication a(argc, argv);
+    // qRegisterMetaType<size_t>();
     Helper::SetStyle("gray");
     MainWindow w;
     w.show();

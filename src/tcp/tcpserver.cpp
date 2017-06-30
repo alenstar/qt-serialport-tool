@@ -14,6 +14,11 @@
 TcpServer::TcpServer(const char *addr, int port, QObject *parent)
     : QObject(parent), _fd(0), _addr(addr), _port(port) {}
 
+TcpServer::~TcpServer()
+{
+
+}
+
 int TcpServer::get_fd() { return _fd; }
 
 bool TcpServer::listen() {
@@ -92,7 +97,6 @@ void TcpServer::onaccept(aeEventLoop *loop, int fd, int mask) {
     c->src_addr[strlen(cip)] = '\0';
     _clients.insert(std::make_pair(cfd, c));
   }
-  ::write(cfd, "hello world !", 14);
 }
 
 void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
@@ -119,7 +123,19 @@ void TcpServer::onread(aeEventLoop *loop, int fd, int mask) {
     LOGI("Client closed connection");
     unlinkFileEvent(loop, fd);
     return;
+  } else {
+      char peer[16 + 5] = {0x00};
+      char sock[16 + 5] = {0x00};
+      anetFormatPeer(fd, peer, 21);
+      anetFormatSock(fd, sock, 21);
+      _buffer[nread] = '\0';
+    LOGD("onread[%3d]: %s --> %s %s", nread, peer, sock,  _buffer);
+    /*
+    if (this->onmessage) {
+        this->onmessage(fd, _buffer, nread);
+    }
+    */
+    emit this->onmessage(fd, _buffer, nread);
   }
   }while(nread == BUFFER_SIZE);
-  LOGD("onread:%d %s",_fd,  _buffer);
 }

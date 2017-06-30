@@ -117,6 +117,8 @@ MainWindow::MainWindow(QWidget *parent)
   // SLOT(onPortAddedOrRemoved()));
 
   // connect(ui->action_Setup, SIGNAL(triggered()), SLOT(onSetUp_triggered()));
+
+
 }
 
 MainWindow::~MainWindow() {
@@ -386,6 +388,14 @@ void MainWindow::on_btn_tcp_listen_clicked() {
     _tcp_server =
         new TcpServer(ui->cbox_tcp_addr->currentText().toStdString().c_str(),
                       ui->cbox_tcp_port->currentText().toInt());
+    /*
+    _tcp_server->onmessage = std::bind(&MainWindow::onmessage, this,
+                                       std::placeholders::_1,
+                                       std::placeholders::_2,
+                                       std::placeholders::_3);
+                                       */
+    connect(_tcp_server, SIGNAL(onmessage(int, char*, unsigned int)),
+            this, SLOT(onmessage(int, char*, unsigned int)));
   }
   if (_tcp_server->is_running()) {
     _tcp_server->close();
@@ -405,4 +415,31 @@ void MainWindow::on_btn_tcp_listen_clicked() {
       ui->cbox_tcp_port->setDisabled(true);
     }
   }
+}
+
+void MainWindow::onmessage(int fd, char *data, unsigned int len)
+{
+    char peer[16 + 5] = {0x00};
+char sock[16 + 5] = {0x00};
+anetFormatPeer(fd, peer, 21);
+anetFormatSock(fd, sock, 21);
+//QString str = QString("%1 %2-->%3 %4").arg(len, 3).arg(peer).arg(sock).arg(data);
+QString str = QString("[%1] %2-->%3 ").arg(len, 3).arg(peer).arg(sock); //.arg(data);
+for(int i = 0; i < len; i++ ) {
+   switch (data[i]) {
+   case '\t':
+       str.append("\\t");
+       break;
+   case '\r':
+       str.append("\\r");
+       break;
+   case '\n':
+       str.append("\\n");
+       break;
+    default:
+       str.append(QChar(data[i]));
+       break;
+   }
+}
+ui->recvEdit->appendPlainText(str);
 }
