@@ -17,7 +17,7 @@
    <string>SerialPort Assistant</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../res/mainwindow.qrc">
+   <iconset>
     <normaloff>:/logo.png</normaloff>:/logo.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="topLayout" stretch="0">
@@ -54,7 +54,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>4</number>
         </property>
         <widget class="QWidget" name="tabServer">
          <attribute name="title">
@@ -710,6 +710,37 @@
           </layout>
          </widget>
         </widget>
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>通用工具</string>
+         </attribute>
+         <widget class="QPushButton" name="btnArray2str">
+          <property name="geometry">
+           <rect>
+            <x>60</x>
+            <y>40</y>
+            <width>80</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>数组转字符串</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnStr2array">
+          <property name="geometry">
+           <rect>
+            <x>210</x>
+            <y>40</y>
+            <width>80</width>
+            <height>24</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>字符串转数组</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
       </item>
       <item>
@@ -834,8 +865,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../res/mainwindow.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

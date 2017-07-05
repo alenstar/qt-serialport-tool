@@ -306,15 +306,14 @@ void MainWindow::onSetUp_triggered() {
 }
 
 #if 0
-const QByteArray &MainWindow::stringToHex(QByteArray &array,
-                                          const QString &string)
+const QByteArray &&MainWindow::stringToHex(const QString &string)
 {
+    QByteArray array;
     char str_h, str_l, data;
     int i, len = string.length();
-    array.clear();
 
     for (i = 0; i < len;) {
-        if ((i + 1) >= len) return array;
+        if ((i + 1) >= len) return std::move(array);
         //str_h = string[i].toAscii();
         str_h = string[i].toAscii();
         if (str_h == ' ') {
@@ -323,46 +322,46 @@ const QByteArray &MainWindow::stringToHex(QByteArray &array,
         }
         i++;
         str_l = string[i].toAscii();
-        if (str_l == ' ') return array;
+        if (str_l == ' ') return std::move(array);
 
         data = charToHex(str_h) * 16 + charToHex(str_l);
         array.append(data);
         qDebug() << "send: " << ((int)data & 0x00ff);
     }
 
-    return array;
+    return std::move(array);
 }
 
-const QString &MainWindow::showHex(QString &string, const QByteArray &array)
+const QString &&MainWindow::showHex(const QByteArray &array)
 {
     int i, len = array.length();
     char c;
-    string.clear();
+    QString str;
 
     for (i = 0; i < len; i++) {
         c = array[i] / 16;
         if (c >= 0 && c <= 9)
-            string.append(c + '0');
+            str.append(c + '0');
         else {
             if (c > 9)
-                string.append(c + 'a');
+                str.append(c + 'a');
         }
         qDebug() << "recv: " << c;
 
         c = array[i] - c;
         c = (c > 0) ? c : (-c);
         if (c >= 0 && c <= 9)
-            string.append(c + '0');
+            str.append(c + '0');
         else {
             if (c > 9)
-                string.append(c + 'a');
+                str.append(c + 'a');
         }
         qDebug() << """recv: " << c;
 
-        if ((i + 1) % 16) string.append(' ');
-        else string.append('\n');
+        if ((i + 1) % 16) str.append(' ');
+        else str.append('\n');
     }
-    return string;
+    return std::move(string);
 }
 
 char MainWindow::charToHex(char c)
@@ -443,3 +442,38 @@ for(int i = 0; i < len; i++ ) {
 }
 ui->recvEdit->appendPlainText(str);
 }
+
+
+void MainWindow::on_btnStr2array_clicked()
+{
+        QString out;
+         QByteArray str = ui->sendEdit->toPlainText().toUtf8();
+    for (auto& var: str) {
+        if (out.size() != 0) {
+            out.append(", ");
+        }
+        QString c = QString("0x%1").arg(var, 1, 16);
+       out.append(c);
+    }
+    ui->recvEdit->setPlainText(out);
+}
+
+void MainWindow::on_btnArray2str_clicked()
+{
+    QString out;
+    QString str = ui->sendEdit->toPlainText().trimmed();
+    QStringList ss = str.split(',');
+    for (auto& var: ss) {
+        QString v = var.trimmed();
+        char c = 0;
+        if(v.startsWith("0x")) {
+            bool ok = false;
+            c = var.toInt(&ok, 16);
+        } else {
+            c = var.toInt();
+        }
+       out.append(c);
+    }
+    ui->recvEdit->setPlainText(out);
+}
+
