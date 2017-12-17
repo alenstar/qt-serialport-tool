@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets network
 
 TARGET = serialport
 TEMPLATE = app
@@ -24,18 +24,9 @@ SOURCES += src/main.cpp\
     src/aerobutton/aerobutton.cpp \
     src/helper.cpp \
     src/messagebox.cpp \
-    src/aeio/adlist.c \
-    src/aeio/ae.c \
-    src/aeio/anet.c \
-    src/aeio/common.c \
-    src/aeio/forward.c \
-    src/aeio/syncio.c \
-    src/aeio/zmalloc.c \
-    src/tcp/tcpclient.cpp \
-    src/udp/udpclient.cpp \
-    src/tcp/tcpserver.cpp \
-    src/udp/udpserver.cpp \
-    src/loop/loop.cpp
+    src/tcpserver.cpp \
+    src/tcpclient.cpp \
+    src/sessionlistmodel.cpp
 
 HEADERS  += src/mainwindow.h \
     src/qled.h \
@@ -45,11 +36,9 @@ HEADERS  += src/mainwindow.h \
     src/aerobutton/aerobutton.h \
     src/helper.h \
     src/messagebox.h \
-    src/tcp/tcpclient.h \
-    src/udp/udpclient.h \
-    src/tcp/tcpserver.h \
-    src/udp/udpserver.h \
-    src/loop/loop.h
+    src/tcpserver.h \
+    src/tcpclient.h \
+    src/sessionlistmodel.h
 
 FORMS    += ui/mainwindow.ui \
     ui/setupdialog.ui \

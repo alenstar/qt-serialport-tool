@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QStringListModel>
 #include <QLabel>
 #include "mdialog.h"
-#include "tcp/tcpserver.h"
+#include "sessionlistmodel.h"
+#include "tcpserver.h"
+#include "tcpclient.h"
 namespace Ui
 {
 class MainWindow;
@@ -52,9 +54,13 @@ private slots:
 
     void onSetUp_triggered();
 
-    void on_btn_tcp_listen_clicked();
+    void onmessage(QString& session, QByteArray& data);
+    void on_btnClient_clicked(bool checked);
 
-    void onmessage(int fd, char* data, unsigned int len);
+    void on_btn_tcp_listen_clicked(bool checked);
+
+    void on_listBox_clicked(const QModelIndex &index);
+
 private:
     Ui::MainWindow *ui;
 
@@ -69,8 +75,11 @@ private:
     QString portName;
     QString g_string;
     QByteArray g_array;
+    QStringList msg_list_;
+    SessionListModel* msg_model_;
 
     TcpServer* _tcp_server;
+    TcpClient* tcp_client_;
 };
 
 #endif // MAINWINDOW_H

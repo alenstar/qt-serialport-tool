@@ -1,16 +1,19 @@
 #include "mainwindow.h"
 #include "helper.h"
-#include "loop/loop.h"
 #include <memory>
 #include <QApplication>
 #include <QTextCodec>
+#include "easylogging++.h"
 
-Loop* defaultLoop = 0;
+INITIALIZE_EASYLOGGINGPP
 
 //Q_DECLARE_METATYPE(size_t)
 
 int main(int argc, char *argv[])
 {
+        START_EASYLOGGINGPP(argc, argv);
+   el::Loggers::reconfigureAllLoggers(el::ConfigurationType::Format,
+                                       "%datetime %func[%fbase] %level: %msg");
 #if (QT_VERSION > QT_VERSION_CHECK(5,0,0))
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 #endif
@@ -20,8 +23,5 @@ int main(int argc, char *argv[])
     Helper::SetStyle("gray");
     MainWindow w;
     w.show();
-    std::unique_ptr<Loop> loop(new Loop(0));
-    loop->start();
-    Loop::default_loop(loop->get_loop());
     return a.exec();
 }

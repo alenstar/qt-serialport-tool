@@ -62,6 +62,14 @@ MainWindow::MainWindow(QWidget *parent)
     //! [0]
 #endif
   ui->led->turnOff();
+  //msg_model_ = new QStringListModel(msg_list_, this);
+  msg_model_ = new SessionListModel(this);
+  ui->listBox->setModel(msg_model_);
+  _tcp_server = new TcpServer(this);
+      connect(_tcp_server, &TcpServer::on_message,
+            this, &MainWindow::onmessage);
+    tcp_client_ = new TcpClient(this);
+    connect(tcp_client_, &TcpClient::on_message, this, &MainWindow::onmessage);
 
   timer = new QTimer(this);
   timer->setInterval(40);
@@ -105,8 +113,8 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->openCloseButton, SIGNAL(clicked()),
           SLOT(onOpenCloseButton_clicked()));
   connect(ui->sendButton, SIGNAL(clicked()), SLOT(onSendButton_clicked()));
-  connect(ui->wordWrapBox, SIGNAL(stateChanged(int)),
-          SLOT(onWordWrapBox_stateChanged(int)));
+  //connect(ui->wordWrapBox, SIGNAL(stateChanged(int)),
+  //        SLOT(onWordWrapBox_stateChanged(int)));
 
   connect(timer, SIGNAL(timeout()), SLOT(onReadyRead()));
   connect(port, SIGNAL(readyRead()), SLOT(onReadyRead()));
@@ -208,7 +216,26 @@ void MainWindow::onOpenCloseButton_clicked() {
 }
 
 void MainWindow::onSendButton_clicked() {
-  if (port->isOpen() && !ui->sendEdit->toPlainText().isEmpty()) {
+    switch (ui->tabWidget->currentIndex()) {
+    case 0: { // forward
+        break;
+    }
+    case 1: { // server
+        if (_tcp_server->is_running() && !ui->sendBox->toPlainText().isEmpty()) {
+            QByteArray ba = ui->sendBox->toPlainText().toLocal8Bit();
+           _tcp_server->post_message(ba);
+        }
+        break;
+    }
+    case 2: { // client
+        if (tcp_client_->is_running() && !ui->sendBox->toPlainText().isEmpty()) {
+            QByteArray ba = ui->sendBox->toPlainText().toLocal8Bit();
+           tcp_client_->post_message(ba);
+        }
+        break;
+    }
+    case 3:{ // serialport
+        if (port->isOpen() && !ui->sendBox->toPlainText().isEmpty()) {
     if (ui->hexSendBox->isChecked()) {
       // port->write(stringToHex(g_array,
       // ui->sendEdit->toPlainText().toLatin1()));
@@ -216,7 +243,7 @@ void MainWindow::onSendButton_clicked() {
       char data;
       QStringList list;
       g_array.clear();
-      list = ui->sendEdit->toPlainText().split(" ");
+      list = ui->sendBox->toPlainText().split(" ");
       for (int i = 0; i < list.count(); i++) {
         if (list.at(i) == " ")
           continue;
@@ -231,22 +258,31 @@ void MainWindow::onSendButton_clicked() {
       }
       port->write(g_array);
     } else
-      port->write(ui->sendEdit->toPlainText().toLatin1());
+      port->write(ui->sendBox->toPlainText().toLatin1());
   }
+        break;
+    }
+    default:
+        break;
+
+    }
+
+
   if (ui->clearBox->isChecked())
-    ui->sendEdit->clear();
+    ui->sendBox->clear();
 }
 
 void MainWindow::onWordWrapBox_stateChanged(int state) {
   // if(ui->wordWrapBox->checkState() == Qt::Checked)
   // ui->recvEdit->insertPlainText(WORD_WRAP);
   if (state == Qt::Checked)
-    ui->recvEdit->insertPlainText(WORD_WRAP);
+    ui->recvBox->insertPlainText(WORD_WRAP);
 }
 
 void MainWindow::onReadyRead() {
   if (port->bytesAvailable()) {
-    ui->recvEdit->moveCursor(QTextCursor::End);
+    ui->recvBox->moveCursor(QTextCursor::End);
+    /*
     if (ui->hexShowBox->isChecked()) {
       g_string.clear();
       // ui->recvEdit->insertPlainText(showHex(g_string, port->readAll()));
@@ -262,6 +298,7 @@ void MainWindow::onReadyRead() {
       ui->recvEdit->insertPlainText(QString::fromLatin1(port->readAll()));
     if (ui->wordWrapBox->isChecked())
       ui->recvEdit->insertPlainText(WORD_WRAP);
+      */
   }
 }
 
@@ -383,63 +420,57 @@ char MainWindow::charToHex(char c)
 }
 #endif
 
-void MainWindow::on_btn_tcp_listen_clicked() {
-  if (!_tcp_server) {
-    _tcp_server =
-        new TcpServer(ui->cbox_tcp_addr->currentText().toStdString().c_str(),
-                      ui->cbox_tcp_port->currentText().toInt());
-    /*
-    _tcp_server->onmessage = std::bind(&MainWindow::onmessage, this,
-                                       std::placeholders::_1,
-                                       std::placeholders::_2,
-                                       std::placeholders::_3);
-                                       */
-    connect(_tcp_server, SIGNAL(onmessage(int, char*, unsigned int)),
-            this, SLOT(onmessage(int, char*, unsigned int)));
-  }
-  if (_tcp_server->is_running()) {
-    _tcp_server->close();
-    ui->btn_tcp_listen->setChecked(false);
-    ui->cbox_tcp_addr->setDisabled(false);
-    ui->cbox_tcp_port->setDisabled(false);
-  } else {
-    _tcp_server->set_parameters(
-        ui->cbox_tcp_addr->currentText().toStdString().c_str(),
-        ui->cbox_tcp_port->currentText().toInt());
-    if (!_tcp_server->listen()) {
-      // qDebug("tcp listen failed!");
-    } else {
-      qDebug("tcp listen success");
-      ui->btn_tcp_listen->setChecked(true);
-      ui->cbox_tcp_addr->setDisabled(true);
-      ui->cbox_tcp_port->setDisabled(true);
+void MainWindow::onmessage(QString& session, QByteArray& data)
+{
+//QString str = QString("%1 %2-->%3 %4").arg(len, 3).arg(peer).arg(sock).arg(data);
+QString str = QString("%1 [%2] %3 -->").arg(QTime::currentTime().toString()).arg(data.size(), 4).arg(session); //.arg(data);
+int row = msg_model_->rowCount();
+if (msg_model_->insertRow(row) ){
+    QModelIndex idx = msg_model_->index(row);
+    bool ok = msg_model_->setData(idx, str, Qt::DisplayRole);
+    if (!ok) {
+       LOGE("setData DisplayRole failed");
     }
-  }
+    ok = msg_model_->setData(idx, data, Qt::UserRole); // QStringListModel not support Qt::UserRole
+    if (!ok) {
+       LOGE("setData UserRole failed");
+    }
+
+} else {
+    LOGE("insertRow failed");
+}
 }
 
-void MainWindow::onmessage(int fd, char *data, unsigned int len)
+void MainWindow::on_btnClient_clicked(bool checked)
 {
-    char peer[16 + 5] = {0x00};
-char sock[16 + 5] = {0x00};
-anetFormatPeer(fd, peer, 21);
-anetFormatSock(fd, sock, 21);
-//QString str = QString("%1 %2-->%3 %4").arg(len, 3).arg(peer).arg(sock).arg(data);
-QString str = QString("[%1] %2-->%3 ").arg(len, 3).arg(peer).arg(sock); //.arg(data);
-for(int i = 0; i < len; i++ ) {
-   switch (data[i]) {
-   case '\t':
-       str.append("\\t");
-       break;
-   case '\r':
-       str.append("\\r");
-       break;
-   case '\n':
-       str.append("\\n");
-       break;
-    default:
-       str.append(QChar(data[i]));
-       break;
+    if (checked) {
+       if (tcp_client_->is_running()) tcp_client_->stop();
+       tcp_client_->start(ui->cboxClientHost->currentText(), ui->cboxClientPort->currentText().toInt());
+    } else {
+       tcp_client_->start(ui->cboxClientHost->currentText(), ui->cboxClientPort->currentText().toInt());
+    }
+}
+
+void MainWindow::on_btn_tcp_listen_clicked(bool checked)
+{
+   LOGD("%s", checked ? "true":"false");
+   if (checked) {
+         if (_tcp_server->is_running()) {
+    _tcp_server->stop();}
+    ui->cbox_tcp_addr->setDisabled(true);
+    ui->cbox_tcp_port->setDisabled(true);
+            _tcp_server->start(ui->cbox_tcp_addr->currentText(),
+                      ui->cbox_tcp_port->currentText().toInt());
+   } else {
+         if (_tcp_server->is_running()) {
+    _tcp_server->stop();}
+      ui->cbox_tcp_addr->setDisabled(false);
+      ui->cbox_tcp_port->setDisabled(false);
    }
 }
-ui->recvEdit->appendPlainText(str);
+
+void MainWindow::on_listBox_clicked(const QModelIndex &index)
+{
+QByteArray var = msg_model_->data(index, Qt::UserRole).value<QByteArray>();
+ui->recvBox->setText(QString(var));
 }

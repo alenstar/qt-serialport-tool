@@ -2,6 +2,7 @@
 #define LOGDEF_H_
 #include <stdio.h>
 #include <string.h>
+#include "easylogging++.h"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #if 1 //def DEBUG
@@ -32,6 +33,11 @@
 #define LOGI(...)  ((void)0)
 #endif
 #endif
+#else
+    #define LOGI(...) el::Loggers::getLogger("default")->info(__VA_ARGS__)
+    #define LOGD(...) el::Loggers::getLogger("default")->debug(__VA_ARGS__)
+	#define LOGW(...) el::Loggers::getLogger("default")->warn(__VA_ARGS__)
+    #define LOGE(...) el::Loggers::getLogger("default")->error(__VA_ARGS__)
 #endif
 
 #endif // LOGDEF_H_
