@@ -61,6 +61,9 @@ private slots:
 
     void on_listBox_clicked(const QModelIndex &index);
 
+    void on_btnStr2array_clicked();
+
+    void on_btnArray2str_clicked();
 private:
     Ui::MainWindow *ui;
 
